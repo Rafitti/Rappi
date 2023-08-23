@@ -1,0 +1,38 @@
+<div class="fscustom">
+	
+	<div class="contenedor">
+		<h1 class="AD"><img src="assets\logo.png" ></h1>
+    	<mat-card class="mat-elevation-z5">
+           	<mat-card-content>
+          		<form [formGroup]="form" (ngSubmit)="inciosesion()">
+					
+					<mat-form-field appearance="outline">
+						<input type="text" matInput placeholder="Legajo" formControlName="usuario">
+					</mat-form-field>
+					
+
+					
+					<mat-form-field appearance="outline">
+						<input type="password" matInput placeholder="Contraseña" formControlName="password">
+					</mat-form-field>
+					
+
+					<p *ngIf="wakawaka" class="error">
+						{{Errormsg}}
+					</p>
+
+            		<div class="button">
+						
+              			<button mat-raised-button type="submit" color="primary">Ingresar</button>
+            		</div>
+
+          		</form>
+        	</mat-card-content>
+			<section [hidden]="!loginOK">
+				<mat-card-footer>
+					<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+				</mat-card-footer>
+			</section>
+		</mat-card>
+	</div>
+</div>

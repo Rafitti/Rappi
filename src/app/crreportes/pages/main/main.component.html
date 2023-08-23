@@ -1,0 +1,55 @@
+<main>
+  <mat-toolbar color="primary" >
+    <button mat-icon-button
+      (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+
+    </button>
+    <span class="spacer"></span>
+    <button mat-button (click)="logout()">Logout</button>
+  </mat-toolbar>
+
+  <mat-sidenav-container fullscreen >
+    <mat-sidenav #sidenav mode="side" closed>
+      <mat-nav-list>
+        <mat-accordion>
+          <ng-container *ngFor="let navbarItem of sidebarItems">
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <!-- TODO:se debe mejorar para que la estructura reciba los datos de un permiso
+                  solo luego del panel-title <i [ngClass]="sidebarItems.icon"></i>&nbsp;
+                {{ sidebarItems.description }}
+                -->
+                  <mat-icon>{{navbarItem.icon}}</mat-icon>&nbsp;
+                      {{navbarItem.description}}
+                </mat-panel-title>
+
+              </mat-expansion-panel-header>
+              <mat-nav-list>
+                <!-- TODO: usar esta estructura cuando tengamos los usuarios de prueba
+                <ng-container *ngFor="let navigationItem of sidebarItems.navigationItems">
+                    <a mat-list-item (click)="navigate(navigationItem)" [ngClass]="navigationItem.checked ? 'highlight' : ''">
+                        <i [ngClass]="navigationItem.icon"></i>
+                        {{ navigationItem.description }}
+                    </a>-->
+                <ng-container *ngFor="let navigationItem of navbarItem.navigationItems">
+                    <a mat-list-item *ngIf="navigationItem.route === ''"><mat-icon>{{navigationItem.icon}}</mat-icon>&nbsp;
+                      {{ navigationItem.description }}</a>
+                    <a mat-list-item *ngIf="navigationItem.route" routerLink="{{navigationItem.route}}" (click)="sidenav.toggle()">
+                    
+                        <mat-icon>{{navigationItem.icon}}</mat-icon>&nbsp;
+                        {{ navigationItem.description }}
+                    </a>
+                </ng-container>
+                </mat-nav-list>
+
+            </mat-expansion-panel>
+          </ng-container>
+        </mat-accordion>
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <router-outlet></router-outlet>
+  </mat-sidenav-container>
+</main>

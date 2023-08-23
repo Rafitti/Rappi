@@ -1,0 +1,182 @@
+<main>
+    <mat-card>
+        <header class="header-container">
+            <h1>
+                Reporte por sucursales
+            </h1>
+        </header>
+        <div class="header-actions" >
+        <!-- <mat-form-field class="header-child" appearance="fill">
+          <mat-label>Seleccione Sucursal</mat-label>
+          <mat-select #mySelBranch multiple (selectionChange)="filter($event)">
+            <mat-option Ng [value]="0" (click)="toggleAllSelection(mySelBranch)" >TODAS LAS SUCURSALES</mat-option>
+            <mat-option #matOption (click)="click(matOption)"  *ngFor="let data of currentData" [value]="data.id_Suc" >{{data.id_Suc}} - {{data.descripcion}}</mat-option>
+          </mat-select>
+        </mat-form-field> -->
+        <mat-form-field [formGroup]="uuu" class="header-child" appearance="fill">
+          <mat-label>Seleccione Sucursal</mat-label>
+          <mat-select formControlName="userType"  multiple>
+            <mat-option #allSelected (click)="Marcados()" [value]="0">TODAS LAS SUCURSALES</mat-option>
+            
+            <mat-option *ngFor="let data of currentData"
+                [value]="data.id_suc" (click)="DesmarqueMarque(!allSelected.selected)">
+                {{data.id_suc}} - {{data.descripcion}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+                  <mat-form-field class="header-child" appearance="fill">
+                    <mat-label>Ingrese Rango de fecha</mat-label>
+                    <mat-date-range-input [rangePicker]="picker" >
+                      <input readonly matStartDate [formControl]="desdeControl" placeholder="Inicio">
+                      <input readonly matEndDate [formControl]="hastaControl"  placeholder="Fin">
+                    </mat-date-range-input>
+                    <mat-hint>Desde – Hasta</mat-hint>
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                  </mat-form-field>
+                  
+                  <mat-checkbox matTooltip="Sin devolucion" class="checkbox-spacing"color="primary" [(ngModel)]="checkbox1" (change)="changeSelection()">Sin Devolución</mat-checkbox>
+                  <mat-checkbox class="checkbox-spacing" color="primary"[(ngModel)]="checkbox2" (change)="changeSelection()">Devolución Total</mat-checkbox>
+                  <mat-checkbox class="checkbox-spacing" color="primary"[(ngModel)]="checkbox3" (change)="changeSelection()">Devolución Parcial</mat-checkbox>
+          
+                  <button mat-raised-button class="header-child" color="primary" (click)="getConsulta()">Consultar</button> 
+          
+            
+        </div>
+    </mat-card>
+
+    <div>
+      <mat-card >
+
+        <div class="header-container" *ngIf="dataSource.data.length >0">
+
+
+          <div class="actions-container">
+              <button
+                  mat-stroked-button
+                  appRoundButton
+                  matTooltip="Exportar reporte a Excel"
+                  (click)="exportToExcel()"
+              >
+                  <mat-icon class="white-icon">sim_card_download</mat-icon>
+                  Exportar
+              </button>
+          </div>
+          <h2></h2>
+      </div>
+        <div class="mat-elevation-z8">    
+
+          <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows>
+
+            <ng-container matColumnDef="sucursal">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Sucursal</th>
+              <td mat-cell *matCellDef="let element"> {{element.sucursal}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="orden" >
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Orden</th>
+              <td mat-cell *matCellDef="let element"> {{element.orden}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="pedido">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Pedido</th>
+              <td mat-cell *matCellDef="let element"> {{element.pedido}} </td>
+            </ng-container>
+          
+            <ng-container matColumnDef="terminal">
+              <th mat-header-cell *matHeaderCellDef>Terminal - TX </th>
+              <td mat-cell *matCellDef="let element"> {{element.terminal}} - {{element.transaccion}} </td>
+            </ng-container>
+            <ng-container matColumnDef="fecha_ticket">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha Hora Ticket</th>
+              <td mat-cell *matCellDef="let element"> {{element.fecha_ticket  | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="importe">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Importe</th>
+              <td mat-cell *matCellDef="let element"> $ {{element.importe}} </td>
+            </ng-container>
+            <ng-container matColumnDef="estado_cancelacion">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+              <td mat-cell *matCellDef="let element"> {{element.estado_cancelacion == 0 ? "Sin Devoluciones" : element.estado_cancelacion ==1 ? "Devolucion Total" :"Devolucion Parcial"}}</td>
+            </ng-container>
+            <ng-container matColumnDef="importe_cancelado">
+              <th mat-header-cell *matHeaderCellDef>Devoluciones</th>
+              <td mat-cell *matCellDef="let element"> $ {{element.importe_cancelado}} </td>
+            </ng-container>
+             
+          
+            <ng-container matColumnDef="expandedDetail">
+              <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+                  <!-- logica expansion de tabla para el futuro -->
+                <!-- <div [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                    
+                  <app-expansion-data class="example-element-detail mat-elevation-z8"></app-expansion-data>
+                </div> -->
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+            [ngClass]="color(element.estado_cancelacion)"
+            [class.example-expanded-row]="expandedElement === element"
+            (click)="expandedElement = expandedElement === element ? null : element">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+
+            <tr  class = "mat-row" *matNoDataRow > 
+              <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                <app-no-data-component
+                [icon]="'content_paste_search'"
+                [mainMessage]="'No hay nada para mostrar.'"
+                [description]="'No hay datos para mostrar para el reporte solicitado o no se selecciono ningun filtro'"
+                [imageOpacity]="0.7"
+                ></app-no-data-component>
+              </td>
+            </tr > 
+          </table> 
+          
+          <mat-paginator  
+          #myPaginator
+          [length]="this.data_table_report.length" 
+
+          [pageSize]="10" 
+          [pageSizeOptions]="[10,50,100,200]"
+          showFirstLastButtons></mat-paginator> 
+        </div>
+      </mat-card>
+    </div>
+    <ng-template #noData>
+      
+    </ng-template>
+
+<!-- 
+          <table mat-table [dataSource]="dataSource" matSort>
+ 
+   <ng-container matColumnDef="sucursal">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Sucursal</th>
+    <td mat-cell *matCellDef="let element"> {{element.sucursal}} </td>
+  </ng-container>
+  <ng-container matColumnDef="orden">
+    <th mat-header-cell *matHeaderCellDef>Orden</th>
+    <td mat-cell *matCellDef="let element"> {{element.orden}} </td>
+  </ng-container>
+  <ng-container matColumnDef="pedido">
+    <th mat-header-cell *matHeaderCellDef>Pedido</th>
+    <td mat-cell *matCellDef="let element"> {{element.pedido}} </td>
+  </ng-container>
+  <ng-container matColumnDef="terminal">
+    <th mat-header-cell *matHeaderCellDef>Terminal - TX </th>
+    <td mat-cell *matCellDef="let element"> {{element.terminal}} - {{element.transaccion}} </td>
+  </ng-container>
+  <ng-container matColumnDef="tickt">
+    <th mat-header-cell *matHeaderCellDef>Fecha Hora Ticket</th>
+    <td mat-cell *matCellDef="let element"> {{element.fechA_TICKET}} - {{element.horA_TICKET}} </td>
+  </ng-container>
+  <ng-container matColumnDef="importe">
+    <th mat-header-cell *matHeaderCellDef>Importe</th>
+    <td mat-cell *matCellDef="let element"> {{element.importe}} </td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+-->
+</main>

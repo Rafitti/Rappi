@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  secret: "#@CRW&&161&&DEV$",
+  rappiApi: "http://desa5web18/CotoRappi/ApiCotoRappiWeb/",
+
 };
 
 /*
